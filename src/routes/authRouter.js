@@ -2,6 +2,7 @@ const express = require('express');
 const userModel = require('../models/userModel');
 const stationModel = require('../models/ownerModel');
 const loginModel = require('../models/loginModel');
+const ownerModel = require('../models/ownerModel');
 
 const authRouter = express.Router();
 
@@ -191,4 +192,69 @@ authRouter.get('/updatestation/:stationid', async (req, res) => {
 
     }
 })
+
+authRouter.post('/ownerregistration', async (req, res) => {
+    try {
+        console.log(req.body);
+
+        const oldEmail = await ownerModel.findOne({ Email: req.body.Email });
+        if (oldEmail) {
+            return res.status(400).json({ success: false, error: true, message: 'Email id already exists' });
+        }
+
+        const oldMobile = await ownerModel.findOne({ PhoneNumber: req.body.PhoneNumber });
+        if (oldEmail) {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: 'Mobile number already exists'
+            });
+        }
+
+        const oldUser = await loginModel.findOne({ username: req.body.username });
+        if (oldUser) {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: 'User already exists'
+            });
+        }
+
+        const loginData = {
+            username: req.body.username,
+            password: req.body.password,
+            role: 'company',
+            status: 'approved'
+        };
+
+        const saveLogin = await loginModel(loginData).save();
+
+        const ownerRegisterData = {
+            login_id: saveLogin._id,
+            Name: req.body.Name,
+            Email: req.body.Email,
+            PhoneNumber: req.body.PhoneNumber,
+        };
+
+        const saveOwner = await ownerModel(ownerRegisterData).save();
+
+        if (saveOwner) {
+            return res.status(200).json({
+                success: true,
+                error: false,
+                message: 'Registration Completed',
+                data: saveOwner
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: 'Registration Failed'
+            });
+        }
+    } catch (error) {
+
+    }
+});
+
 module.exports = authRouter;
