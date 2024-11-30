@@ -257,4 +257,8 @@ authRouter.post('/ownerregistration', async (req, res) => {
     }
 });
 
+
 module.exports = authRouter;
+
+
+
