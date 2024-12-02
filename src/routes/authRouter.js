@@ -1,8 +1,8 @@
 const express = require('express');
 const userModel = require('../models/userModel');
-const stationModel = require('../models/ownerModel');
 const loginModel = require('../models/loginModel');
 const ownerModel = require('../models/ownerModel');
+const stationModel = require('../models/stationModel');
 
 const authRouter = express.Router();
 
@@ -83,9 +83,40 @@ authRouter.post('/userregistration', async (req, res) => {
     }
 });
 
+authRouter.post('/deleteuser/:login_id', async (req, res) => {
+    try {
+        const id = req.params.login_id;
+
+        const userDeleted = await userModel.deleteOne({ login_id: id });
+        const loginDeleted = await loginModel.deleteOne({ _id: id });
+
+        if (userDeleted.deletedCount === 1 && loginDeleted.deletedCount === 1) {
+            return res.status(200).json({
+                success: true,
+                error: false,
+                message: 'User deleted successfully',
+            });
+        }
+
+        return res.status(400).json({
+            success: false,
+            error: true,
+            message: 'Deletion failed',
+        });
+    } catch (error) {
+        console.error('Error during user deletion:', error);
+        return res.status(500).json({
+            success: false,
+            error: true,
+            message: 'Something went wrong',
+        });
+    }
+});
+
+
 authRouter.post('/chargingstationregistration', (req, res) => {
     try {
-        console.log(req.body);
+        
         const chargingstationdata = {
             StationName: req.body.StationName,
             City: req.body.City,
@@ -98,8 +129,8 @@ authRouter.post('/chargingstationregistration', (req, res) => {
             OperatingHours: req.body.OperatingHours,
             ChargingRate: req.body.ChargingRate,
             StationStatus: req.body.StationStatus,
-        };
-        stationModel(chargingstationdata).save().then((stationData) => {
+        };console.log(chargingstationdata);
+       stationModel(chargingstationdata).save().then((stationData) => {
             return res.status(200).json({
                 success: true,
                 error: false,
@@ -253,6 +284,38 @@ authRouter.post('/ownerregistration', async (req, res) => {
 
     }
 });
+
+
+authRouter.post('/deleteowner/:login_id', async (req, res) => {
+    try {
+        const id = req.params.login_id;
+
+        const ownerDeleted = await ownerModel.deleteOne({ login_id: id });
+        const loginDeleted = await loginModel.deleteOne({ _id: id });
+
+        if (ownerDeleted.deletedCount === 1 && loginDeleted.deletedCount === 1) {
+            return res.status(200).json({
+                success: true,
+                error: false,
+                message: 'Owner deleted successfully',
+            });
+        }
+
+        return res.status(400).json({
+            success: false,
+            error: true,
+            message: 'Deletion failed',
+        });
+    } catch (error) {
+        console.error('Error during deletion:', error);
+        return res.status(500).json({
+            success: false,
+            error: true,
+            message: 'Something went wrong',
+        });
+    }
+});
+
 
 authRouter.post('/checklogin', async (req, res) => {
     try {

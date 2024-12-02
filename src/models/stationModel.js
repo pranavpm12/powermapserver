@@ -3,12 +3,9 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema
 
 const stationSchema = new schema({
-        OwnerID:{type : mongoose.Types.ObjectId},
+        ownerid : {type:mongoose.Types.ObjectId, ref:'owner_tb'},
         StationName:{type : String},
         City:{type : String},
-        OwnerName:{type : String},
-        PhoneNumber:{type : String},
-        Email:{type : String},
         ChargingPortsNo:{type : String},
         TypeofConnectors:{type : String},
         ChargingPower:{type : String},
