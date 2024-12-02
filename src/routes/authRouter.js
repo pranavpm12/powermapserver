@@ -8,10 +8,7 @@ const authRouter = express.Router();
 
 authRouter.get('/login', (req, res) => {
     console.log(req.query);
-    const logindata = {
-        Username: req.query.Username,
-        Password: req.query.Password
-    };
+
     res.send(logindata);
 });
 
@@ -224,7 +221,7 @@ authRouter.post('/ownerregistration', async (req, res) => {
             username: req.body.username,
             password: req.body.password,
             role: 'company',
-            status: 'approved'
+            status: 'pending'
         };
 
         const saveLogin = await loginModel(loginData).save();
@@ -257,7 +254,58 @@ authRouter.post('/ownerregistration', async (req, res) => {
     }
 });
 
+authRouter.post('/checklogin', async (req, res) => {
+    try {
+        const oldUser = await loginModel.findOne({ username: req.body.username })
+        if (!oldUser) {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: 'No user exists'
+            });
+        }
+        if (oldUser.password == req.body.password) {
+            if (oldUser.status == 'approved') {
+                return res.status(200).json({
+                    success: false,
+                    error: true,
+                    data: oldUser
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    error: true,
+                    message: 'waiting for admins approval'
+                });
+            }
+        } else {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: 'Wrong password'
+            });
+        }
 
+
+
+    } catch (error) {
+
+    }
+});
+
+authRouter.post('/statusupdater/login_id', async (req, res) => {
+    try {
+        const { login_id } = req.params;
+        const { status } = req.body;
+
+        const validStatuses = ['approved', 'deleted', 'pending'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ error: 'Invalid status provided.' });
+        }
+    } catch (error) {
+
+    }
+})
 module.exports = authRouter;
 
 
