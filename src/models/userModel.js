@@ -4,9 +4,9 @@ const schema = mongoose.Schema
 
 const userSchema = new schema({
     login_id : {type:mongoose.Types.ObjectId, ref:'login_tb'},
-    Name: { type: String },
-    Email: { type: String },
-    PhoneNumber: { type: Number },
+    name: { type: String },
+    email: { type: String },
+    phoneNumber: { type: Number },
     state : { type : String},
     district : {type : String}, 
     

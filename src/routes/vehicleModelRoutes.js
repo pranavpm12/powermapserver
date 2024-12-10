@@ -26,10 +26,25 @@ vehicleModelRoutes.post("/adminaddvehicle", async (req, res) => {
 });
 
 // Get all vehicle models
-vehicleModelRoutes.get("/", async (req, res) => {
+vehicleModelRoutes.get("/:type", async (req, res) => {
     try {
-        const vehicles = await allvehicleModel.find();
-        res.status(200).json(vehicles);
+        const {type} = req.params
+        if(type=='car'){
+            const vehicles = await allvehicleModel.find();
+            res.status(200).json({
+                sucess: true,
+                error:false,
+                data:vehicles
+            });
+        }else if(type=='bike'){
+            const vehicles = await all2wheelModel.find();
+            res.status(200).json({
+                sucess: true,
+                error:false,
+                data:vehicles
+            });
+        }
+       
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -239,12 +254,12 @@ vehicleModelRoutes.get("/viewuservehicle", async (req, res) => {
 vehicleModelRoutes.put("/updateuservehicle/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { userID, carID, wheelerID, vehicleNumber } = req.body;
+        const { userID, carID, bikeID, vehicleNumber } = req.body;
 
 
 
         // Validate request body
-        if(carID && wheelerID){
+        if(carID && bikeID){
             return res.status(400).json({ error: "invalid vehicleID" });
         }
         if (!userID ||  !vehicleNumber) {

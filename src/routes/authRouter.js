@@ -6,11 +6,6 @@ const stationModel = require('../models/stationModel');
 
 const authRouter = express.Router();
 
-authRouter.get('/login', (req, res) => {
-    console.log(req.query);
-
-    res.send(logindata);
-});
 
 authRouter.post('/userregistration', async (req, res) => {
     try {
@@ -20,14 +15,14 @@ authRouter.post('/userregistration', async (req, res) => {
         if (oldEmail) return res.status(400).json({ success: false, error: true, message: 'Email id already exists' });
 
         const oldMobile = await userModel.findOne({ PhoneNumber: req.body.PhoneNumber })
-        if (oldEmail) {
+        if (oldMobile) {
             return res.status(400).json({
                 success: false,
                 error: true,
                 message: 'mobile number already exists'
             });
         }
-        const oldUser = await loginModel.findOne({ username: req.body.username })
+        const oldUser = await loginModel.findOne({ username: req.body.Username })
         if (oldUser) {
             return res.status(400).json({
                 success: false,
@@ -38,8 +33,8 @@ authRouter.post('/userregistration', async (req, res) => {
 
 
         const loginData = {
-            username: req.body.username,
-            password: req.body.password,
+            username: req.body.Username,
+            password: req.body.Password,
             role: 'user',
             status: 'approved'
         }
@@ -51,11 +46,11 @@ authRouter.post('/userregistration', async (req, res) => {
 
         const userregisterdata = {
             login_id: saveLogin._id,
-            Name: req.body.Name,
-            Email: req.body.Email,
-            PhoneNumber: req.body.PhoneNumber,
-            state: req.body.state,
-            district: req.body.district
+            name: req.body.Name,
+            email: req.body.Email,
+            phoneNumber: req.body.PhoneNumber,
+            state: req.body.State,
+            district: req.body.District
         };
 
         const saveUser = await userModel(userregisterdata).save()
@@ -116,21 +111,21 @@ authRouter.post('/deleteuser/:login_id', async (req, res) => {
 
 authRouter.post('/chargingstationregistration', (req, res) => {
     try {
-        
+
         const chargingstationdata = {
+            Owner_id: req.body.Owner_id,
             StationName: req.body.StationName,
             City: req.body.City,
-            OwnerName: req.body.OwnerName,
-            PhoneNumber: req.body.PhoneNumber,
-            Email: req.body.Email,
             ChargingPortsNo: req.body.ChargingPortsNo,
             TypeofConnectors: req.body.TypeofConnectors,
             ChargingPower: req.body.ChargingPower,
             OperatingHours: req.body.OperatingHours,
             ChargingRate: req.body.ChargingRate,
+            Address: req.body.Address,
             StationStatus: req.body.StationStatus,
-        };console.log(chargingstationdata);
-       stationModel(chargingstationdata).save().then((stationData) => {
+        };
+        console.log(chargingstationdata);
+        stationModel(chargingstationdata).save().then((stationData) => {
             return res.status(200).json({
                 success: true,
                 error: false,
@@ -176,26 +171,30 @@ authRouter.get('/deletestation/:stationid', async (req, res) => {
     }
 });
 
-authRouter.get('/updatestation/:stationid', async (req, res) => {
+authRouter.post('/updatestation/:stationid', async (req, res) => {
     try {
+        console.log('query', req.body);
+
         const stationid = req.params.stationid
         const oldData = await stationModel.findOne({ _id: stationid })
         console.log(oldData)
 
         const updateData = {
-            StationName: req.query.StationName ? req.query.StationName : oldData.StationName,
-            City: req.query.City ? req.query.City : oldData.City,
-            OnwerName: req.query.OwnerName ? req.query.OwnerName : oldData.OnwerName,
-            PhoneNumber: req.query.PhoneNumber ? req.query.PhoneNumber : oldData.PhoneNumber,
-            Email: req.query.Email ? req.query.Email : oldData.Email,
-            ChargingPortsNo: req.query.ChargingPortsNo ? req.query.ChargingPortsNo : oldData.ChargingPortsNo,
-            TypeofConnectors: req.query.TypeofConnectors ? req.query.TypeofConnectors : oldData.TypeofConnectors,
-            ChargingPower: req.query.ChargingPower ? req.query.ChargingPower : oldData.ChargingPower,
-            OperatingHours: req.query.OperatingHours ? req.query.OperatingHours : oldData.OperatingHours,
-            ChargingRate: req.query.ChargingRate ? req.query.ChargingRate : oldData.ChargingRate,
-            StationStatus: req.query.StationStatus ? req.query.StationStatus : oldData.StationStatus,
+            Owner_id: oldData.Owner_id,
+            StationName: req.body.StationName ? req.body.StationName : oldData.StationName,
+            City: req.body.City ? req.body.City : oldData.City,
+            ChargingPortsNo: req.body.ChargingPortsNo ? req.body.ChargingPortsNo : oldData.ChargingPortsNo,
+            TypeofConnectors: req.body.TypeofConnectors ? req.body.TypeofConnectors : oldData.TypeofConnectors,
+            ChargingPower: req.body.ChargingPower ? req.body.ChargingPower : oldData.ChargingPower,
+            OperatingHours: req.body.OperatingHours ? req.body.OperatingHours : oldData.OperatingHours,
+            ChargingRate: req.body.ChargingRate ? req.body.ChargingRate : oldData.ChargingRate,
+            StationStatus: req.body.StationStatus ? req.body.StationStatus : oldData.StationStatus,
+            Address: req.body.Address ? req.body.Address : oldData.Address,
         }
+        console.log(updateData);
         const saveToModel = await stationModel.updateOne({ _id: stationid }, { $set: updateData })
+        console.log(saveToModel);
+
         if (saveToModel.modifiedCount == 1) {
 
             return res.status(200).json({
@@ -231,7 +230,7 @@ authRouter.post('/ownerregistration', async (req, res) => {
         }
 
         const oldMobile = await ownerModel.findOne({ PhoneNumber: req.body.PhoneNumber });
-        if (oldEmail) {
+        if (oldMobile) {
             return res.status(400).json({
                 success: false,
                 error: true,
@@ -239,7 +238,7 @@ authRouter.post('/ownerregistration', async (req, res) => {
             });
         }
 
-        const oldUser = await loginModel.findOne({ username: req.body.username });
+        const oldUser = await loginModel.findOne({ username: req.body.Username });
         if (oldUser) {
             return res.status(400).json({
                 success: false,
@@ -249,8 +248,8 @@ authRouter.post('/ownerregistration', async (req, res) => {
         }
 
         const loginData = {
-            username: req.body.username,
-            password: req.body.password,
+            username: req.body.Username,
+            password: req.body.Password,
             role: 'company',
             status: 'pending'
         };
@@ -259,9 +258,9 @@ authRouter.post('/ownerregistration', async (req, res) => {
 
         const ownerRegisterData = {
             login_id: saveLogin._id,
-            Name: req.body.Name,
-            Email: req.body.Email,
-            PhoneNumber: req.body.PhoneNumber,
+            companyName: req.body.Name,
+            email: req.body.Email,
+            phoneNumber: req.body.PhoneNumber,
         };
 
         const saveOwner = await ownerModel(ownerRegisterData).save();
@@ -316,7 +315,6 @@ authRouter.post('/deleteowner/:login_id', async (req, res) => {
     }
 });
 
-
 authRouter.post('/checklogin', async (req, res) => {
     try {
         const oldUser = await loginModel.findOne({ username: req.body.username })
@@ -356,19 +354,141 @@ authRouter.post('/checklogin', async (req, res) => {
     }
 });
 
-authRouter.post('/statusupdater/login_id', async (req, res) => {
+authRouter.post('/reject_owner/:login_id', async (req, res) => {
     try {
         const { login_id } = req.params;
-        const { status } = req.body;
 
-        const validStatuses = ['approved', 'deleted', 'pending'];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ error: 'Invalid status provided.' });
+        const deleteData = await loginModel.deleteOne({ _id: login_id })
+        if (deleteData.deletedCount == 1) {
+            const deleteOwnerData = await ownerModel.deleteOne({ login_id: login_id })
+            return res.status(200).json({ message: 'Data deleted' });
+        } else {
+            return res.status(400).json({ error: 'Failed' });
         }
     } catch (error) {
-
+        return res.status(500).json({
+            success: false,
+            error: true,
+            message: 'Internal server error'
+        });
     }
 })
+
+authRouter.post('/approve/:login_id', async (req, res) => {
+    try {
+        const { login_id } = req.params;
+
+        const updateData = await loginModel.updateOne({ _id: login_id }, { $set: { status: 'approved' } })
+        if (updateData.modifiedCount == 1) {
+            return res.status(200).json({ message: 'Success' });
+        } else {
+            return res.status(400).json({ error: 'Failed' });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+})
+
+authRouter.get('/all-owners', async (req, res) => {
+    try {
+        const ownerList = await ownerModel.find().populate('login_id')
+        if (ownerList[0]) {
+            return res.status(200).json({
+                success: true,
+                data: ownerList,
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'No data found',
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+});
+
+authRouter.get('/all-users', async (req, res) => {
+    try {
+        const userList = await userModel.find().populate('login_id')
+        if (userList[0]) {
+            return res.status(200).json({
+                success: true,
+                data: userList,
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'No data found',
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+});
+
+authRouter.post('/reject_user/:login_id', async (req, res) => {
+    try {
+        const { login_id } = req.params;
+
+        const deleteData = await loginModel.deleteOne({ _id: login_id })
+        if (deleteData.deletedCount == 1) {
+            const deleteOwnerData = await userModel.deleteOne({ login_id: login_id })
+            return res.status(200).json({ message: 'Data deleted' });
+        } else {
+            return res.status(400).json({ error: 'Failed' });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+})
+
+authRouter.get('/getProfile/:id/:role', async (req, res) => {
+    try {
+        const { id, role } = req.params
+        if (role == 'company') {
+            const ownerList = await ownerModel.findOne({ login_id: id }).populate('login_id')
+            if (ownerList) {
+                return res.status(200).json({
+                    success: true,
+                    data: ownerList,
+                });
+            }
+        } else if (role == 'user') {
+            const ownerList = await userModel.findOne({ login_id: id }).populate('login_id')
+            if (ownerList) {
+                return res.status(200).json({
+                    success: true,
+                    data: ownerList,
+                });
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+});
+
+
 module.exports = authRouter;
 
 
