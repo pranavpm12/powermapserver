@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const schema = mongoose.Schema;
 
-const all2wheelModelSchema = new schema(
+const all3wheelModelSchema = new schema(
     {
         brand: { type: String, required: true, trim: true }, // e.g., "Toyota", "Honda"
         variantname: { type: String, required: true }, // Variant name
@@ -13,5 +13,5 @@ const all2wheelModelSchema = new schema(
     },
 );
 
-const all2wheelModel = mongoose.model('all_2wheel_model_tb', all2wheelModelSchema);
-module.exports = all2wheelModel
+const all3wheelModel = mongoose.model('all_3wheel_model_tb', all3wheelModelSchema);
+module.exports = all3wheelModel

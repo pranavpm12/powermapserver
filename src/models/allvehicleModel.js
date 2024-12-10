@@ -5,14 +5,10 @@ const schema = mongoose.Schema;
 const allvehicleModelSchema = new schema(
     {
         brand: { type: String, required: true, trim: true }, // e.g., "Toyota", "Honda"
-        model: { type: String, required: true, trim: true }, // e.g., "Corolla", "Civic"
-        variants: [
-            {
-                name: { type: String, required: true }, // Variant name
-                range: { type: Number, required: true }, // Range in km
-                batteryCapacity: { type: Number, required: true } // Battery capacity in kWh
-            }
-        ]
+        variantname: { type: String, required: true }, // Variant name
+        range: { type: Number, required: true }, // Range in km
+        batteryCapacity: { type: Number, required: true } // Battery capacity in kWh
+
     },
 );
 
